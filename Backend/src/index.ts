@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
 import { PrismaClient } from '@prisma/client';
+import authRoutes from './routes/authRoutes'
+const PORT = process.env.PORT || 4000;
 
 dotenv.config();
 
@@ -29,7 +31,8 @@ app.get('/api/health', async (req: Request, res: Response) => {
   }
 });
 
-const PORT = process.env.PORT || 4000;
+app.use('/api/auth',authRoutes)
+
 
 server.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
