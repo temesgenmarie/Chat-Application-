@@ -7,7 +7,8 @@
     "strict": true,                         // Enable all strict type checks
     "esModuleInterop": true,                // Allow default imports from CommonJS
     "skipLibCheck": true,                   // Skip checking .d.ts files
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["./src/types","./node_modules/@types"]
   },
   "include": ["src"],                       // Which folders to compile
   "exclude": ["node_modules", "dist"]       // Which folders to ignore

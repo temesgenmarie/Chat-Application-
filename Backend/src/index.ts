@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
 import { PrismaClient } from '@prisma/client';
-import authRoutes from './routes/authRoutes'
+import authRoutes from './routes/authRoutes';
+import conversationRoutes from './routes/conversationRoutes';
+
 const PORT = process.env.PORT || 4000;
 
 dotenv.config();
@@ -32,6 +34,7 @@ app.get('/api/health', async (req: Request, res: Response) => {
 });
 
 app.use('/api/auth',authRoutes)
+app.use('/api/conversations',conversationRoutes)
 
 
 server.listen(PORT, () => {
