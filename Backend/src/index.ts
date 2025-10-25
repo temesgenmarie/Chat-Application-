@@ -2,33 +2,37 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
+import { PrismaClient } from '@prisma/client';
 
-// Load environment variables
 dotenv.config();
 
+const prisma = new PrismaClient();
 const app = express();
-const server = http.createServer(app); // For future Socket.IO integration
+const server = http.createServer(app);
 
-// Middleware
 app.use(cors());
-app.use(express.json()); // Built-in JSON body parser
+app.use(express.json());
 
-// Health check route
-app.get('/api/health', (req: Request, res: Response) => {
-    console.log('it is working fine ')
-  res.status(200).json({
-    status: 'ok',
-    message: 'Server is running smoothly 🚀',
-  });
+app.get('/api/health', async (req: Request, res: Response) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({
+      status: 'ok',
+      message: 'Server and database are running smoothly 🚀',
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Database connection failed ❌',
+      error: String(error),
+    });
+  }
 });
 
-// Set port
 const PORT = process.env.PORT || 4000;
 
-// Start server
 server.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
 
-// Export app for testing or integration (optional)
 export default app;

@@ -7,6 +7,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"),
+    url: "postgresql://neondb_owner:npg_0Oc1APfjlSIU@ep-spring-moon-ahzf4izk-pooler.c-3.us-east-1.aws.neon.tech/chat?sslmode=require&channel_binding=require",
   },
 });

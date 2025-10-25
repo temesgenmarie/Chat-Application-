@@ -4,22 +4,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      =  "postgresql://neondb_owner:npg_0Oc1APfjlSIU@ep-spring-moon-ahzf4izk-pooler.c-3.us-east-1.aws.neon.tech/chat?sslmode=require&channel_binding=require"
 }
-
 model User {
   id        Int       @id @default(autoincrement())
   username  String    @unique
   email     String    @unique
   password  String
-  messages  Message[]
   createdAt DateTime  @default(now())
-}
-
-model Message {
-  id        Int       @id @default(autoincrement())
-  text      String
-  senderId  Int
-  sender    User      @relation(fields: [senderId], references: [id])
-  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
