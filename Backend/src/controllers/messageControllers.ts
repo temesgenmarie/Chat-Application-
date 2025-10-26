@@ -149,7 +149,7 @@ export const editMessage = async (req: Request, res: Response) => {
         if (message.senderId !== userId) {
           return res.status(403).json({ message: "Unauthorized" });
         }
-
+        
         const updatedMessage = await prisma.message.update({
           where: { id: Number(messageId) },
           data: { content },

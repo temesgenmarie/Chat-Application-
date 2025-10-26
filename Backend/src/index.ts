@@ -3,13 +3,15 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
 import { PrismaClient } from '@prisma/client';
+
 import authRoutes from './routes/authRoutes';
 import conversationRoutes from './routes/conversationRoutes';
 import messageRoutes from './routes/messageRoutes';
-
-const PORT = process.env.PORT || 4000;
+import { initSocket } from './sockets/socket'; // Import socket initializer
 
 dotenv.config();
+
+const PORT = process.env.PORT || 4000;
 
 const prisma = new PrismaClient();
 const app = express();
@@ -18,6 +20,7 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint
 app.get('/api/health', async (req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -34,10 +37,13 @@ app.get('/api/health', async (req: Request, res: Response) => {
   }
 });
 
-app.use('/api/auth',authRoutes)
-app.use('/api/conversations',conversationRoutes)
-app.use('/api/messages',messageRoutes)
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/conversations', conversationRoutes);
+app.use('/api/messages', messageRoutes);
 
+// Initialize Socket.io
+initSocket(server);
 
 server.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
