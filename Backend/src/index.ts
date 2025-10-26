@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes';
 import conversationRoutes from './routes/conversationRoutes';
 import messageRoutes from './routes/messageRoutes';
+import contactRoute from './routes/contactRoutes';
 import { initSocket } from './sockets/socket'; // Import socket initializer
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.get('/api/health', async (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/contacts', contactRoute);
 
 // Initialize Socket.io
 initSocket(server);
