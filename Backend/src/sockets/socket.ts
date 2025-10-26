@@ -1,21 +1,19 @@
+// sockets/socket.ts
 import { Server } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
 import http from 'http';
+import prisma from '../config/db';
 
-const prisma = new PrismaClient();
+export let io: Server;
 
 export const initSocket = (server: http.Server) => {
-  const io = new Server(server, {
-    cors: {
-      origin: '*',
-      methods: ['GET', 'POST'],
-    },
+  io = new Server(server, {
+    cors: { origin: '*', methods: ['GET', 'POST'] },
   });
 
   io.on('connection', (socket) => {
-    console.log('New client connected:', socket.id);
+    console.log('Client connected:', socket.id);
 
-    // User joins a conversation
+    // Join conversation room
     socket.on('joinConversation', ({ conversationId, userId }) => {
       socket.join(conversationId);
       console.log(`User ${userId} joined conversation ${conversationId}`);
@@ -25,35 +23,47 @@ export const initSocket = (server: http.Server) => {
     socket.on('sendMessage', async ({ conversationId, content, senderId }) => {
       try {
         const newMessage = await prisma.message.create({
-          data: { content, conversationId, senderId },
+          data: { conversationId, content, senderId },
+          include: { sender: { select: { id: true, username: true } } },
         });
         io.to(conversationId).emit('newMessage', newMessage);
-      } catch (error) {
-        console.error('Error sending message:', error);
+      } catch (err) {
+        console.error(err);
       }
     });
 
     // Edit message
-    socket.on('editMessage', async ({ messageId, newContent, conversationId }) => {
+    socket.on('editMessage', async ({ messageId, newContent, senderId, conversationId }) => {
       try {
+        const message = await prisma.message.findUnique({ where: { id: messageId } });
+        if (!message || message.senderId !== senderId) return;
+
         const updatedMessage = await prisma.message.update({
           where: { id: messageId },
           data: { content: newContent },
         });
         io.to(conversationId).emit('messageUpdated', updatedMessage);
-      } catch (error) {
-        console.error('Error editing message:', error);
+      } catch (err) {
+        console.error(err);
       }
     });
 
     // Delete message
-    socket.on('deleteMessage', async ({ messageId, conversationId }) => {
+    socket.on('deleteMessage', async ({ messageId, senderId, conversationId }) => {
       try {
+        const message = await prisma.message.findUnique({ where: { id: messageId } });
+        if (!message || message.senderId !== senderId) return;
+
         await prisma.message.delete({ where: { id: messageId } });
         io.to(conversationId).emit('messageDeleted', { messageId });
-      } catch (error) {
-        console.error('Error deleting message:', error);
+      } catch (err) {
+        console.error(err);
       }
+    });
+
+    // Typing indicator
+    socket.on('typing', ({ conversationId, userId, isTyping }) => {
+      socket.to(conversationId).emit('typing', { userId, isTyping });
     });
 
     socket.on('disconnect', () => {
