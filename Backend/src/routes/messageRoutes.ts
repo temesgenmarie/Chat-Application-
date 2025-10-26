@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", authMiddleware, getMessages);
 
 router.post("/", authMiddleware, sendMessage);
-router.put("/:messageId ",authMiddleware,editMessage)
-router.delete("/:messageId ",authMiddleware,deleteMessage)
+router.put("/:messageId",authMiddleware,editMessage)
+router.delete("/:messageId",authMiddleware,deleteMessage)
 
 export default router;
