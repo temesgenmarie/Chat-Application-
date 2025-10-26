@@ -5,6 +5,7 @@ import http from 'http';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/authRoutes';
 import conversationRoutes from './routes/conversationRoutes';
+import messageRoutes from './routes/messageRoutes';
 
 const PORT = process.env.PORT || 4000;
 
@@ -35,6 +36,7 @@ app.get('/api/health', async (req: Request, res: Response) => {
 
 app.use('/api/auth',authRoutes)
 app.use('/api/conversations',conversationRoutes)
+app.use('/api/messages',messageRoutes)
 
 
 server.listen(PORT, () => {
